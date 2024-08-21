@@ -86,27 +86,30 @@ class CalendarWrapper(val calendar: Calendar) {
 fun CalendarItem(
     data: CalendarData
 ) {
+    val textColor = when (data.state) {
+        CalendarItemState.NORMAL -> Color.Transparent
+        CalendarItemState.SELECTED -> Color.Blue
+        CalendarItemState.OTHER -> Color.Transparent
+    }
+    val bgColor = when (data.state) {
+        CalendarItemState.NORMAL -> Color.Black
+        CalendarItemState.SELECTED -> Color.White
+        CalendarItemState.OTHER -> Color.LightGray
+    }
     Text(
         text = data.text,
         modifier = Modifier
             .width(30.dp)
             .height(30.dp)
             .background(
-                color = when (data.state) {
-                    CalendarItemState.NORMAL -> Color.Transparent
-                    CalendarItemState.SELECTED -> Color.Blue
-                    CalendarItemState.OTHER -> Color.Transparent
-                }, shape = CircleShape
+                color = textColor,
+                shape = CircleShape
             )
             .padding(5.dp)
             .wrapContentSize(Alignment.Center),
         fontSize = 14.sp,
         textAlign = TextAlign.Center,
-        color = when (data.state) {
-            CalendarItemState.NORMAL -> Color.Black
-            CalendarItemState.SELECTED -> Color.White
-            CalendarItemState.OTHER -> Color.LightGray
-        },
+        color = bgColor,
         style = TextStyle(
             platformStyle = PlatformTextStyle(
                 includeFontPadding = false
@@ -121,7 +124,9 @@ fun CalendarItem(
 @Composable
 fun CalendarHead(mutableCalendar: MutableState<CalendarWrapper>) {
     val calendar = mutableCalendar.value.calendar
-    val weekHead = arrayOf("SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT")
+    val weekHead = remember {
+        arrayOf("SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT")
+    }
     val yyyyMMdd =
         "${calendar.get(Calendar.YEAR)} / ${calendar.get(Calendar.MONTH) + 1}"
     Column {
@@ -175,12 +180,12 @@ private fun Calendar.isSameDay(calendar: Calendar): Boolean {
  */
 @Composable
 fun LeoCalendar(calendar: Calendar) {
-    val c = remember(calendar) {
+    val wrapper = remember(calendar) {
         mutableStateOf(CalendarWrapper(calendar))
     }
-    val weekList = getCalendarList(c.value.calendar)
+    val weekList = getCalendarList(wrapper.value.calendar)
     Column {
-        CalendarHead(c)
+        CalendarHead(wrapper)
         Spacer(modifier = Modifier.height(8.dp))
         weekList.forEach { days ->
             Spacer(modifier = Modifier.height(8.dp))
