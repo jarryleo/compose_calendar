@@ -1,6 +1,5 @@
 package cn.leo.calendar
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -163,7 +162,7 @@ fun CalendarHead(mutableCalendar: MutableState<CalendarWrapper>) {
 }
 
 /**
- * 判断2个 Calendar 是不是同一条
+ * 判断2个 Calendar 是不是同一天
  */
 private fun Calendar.isSameDay(calendar: Calendar): Boolean {
     return this.get(Calendar.YEAR) == calendar.get(Calendar.YEAR) &&
@@ -197,8 +196,11 @@ fun LeoCalendar(calendar: Calendar) {
     }
 }
 
+
+/**
+ * 获取日历数据
+ */
 private fun getCalendarList(c: Calendar): ArrayList<MutableList<CalendarData>> {
-    Log.d("getCalendarList", "${c.time}")
     val calendar = Calendar.getInstance().apply {
         time = c.time
     }
@@ -212,7 +214,6 @@ private fun getCalendarList(c: Calendar): ArrayList<MutableList<CalendarData>> {
     val weekList = arrayListOf<MutableList<CalendarData>>()
     //第一行第一天
     calendar.add(Calendar.DAY_OF_MONTH, -week + 1)
-    var day = calendar.get(Calendar.DAY_OF_MONTH)
     repeat(6) {
         val weekDayList = mutableListOf<CalendarData>()
         repeat(7) {
@@ -221,10 +222,10 @@ private fun getCalendarList(c: Calendar): ArrayList<MutableList<CalendarData>> {
                 state = CalendarItemState.OTHER
             val isToday = Calendar.getInstance().isSameDay(calendar)
             if (isToday) state = CalendarItemState.SELECTED
+            val day = calendar.get(Calendar.DAY_OF_MONTH)
             val element = CalendarData(day.toString(), state)
             weekDayList.add(element)
             calendar.add(Calendar.DAY_OF_MONTH, 1)
-            day = calendar.get(Calendar.DAY_OF_MONTH)
         }
         weekList.add(weekDayList)
     }
