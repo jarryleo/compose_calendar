@@ -13,7 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import cn.leo.calendar.ui.theme.Compose_calendarTheme
-import cn.leo.calendar.ui.theme.LeoCalendar
+import java.util.Calendar
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -39,7 +39,7 @@ fun Home(name: String, modifier: Modifier = Modifier) {
             text = name,
             modifier = modifier
         )
-        LeoCalendar()
+        LeoCalendar(Calendar.getInstance())
     }
 
 }

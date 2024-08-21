@@ -1,5 +1,6 @@
-package cn.leo.calendar.ui.theme
+package cn.leo.calendar
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -16,6 +17,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
@@ -49,6 +51,31 @@ data class CalendarData(
     val text: String,
     val state: CalendarItemState
 )
+
+class CalendarWrapper(val calendar: Calendar) {
+    /**
+     * 切换上一个月
+     */
+    fun monthMinus(): CalendarWrapper {
+        calendar.add(Calendar.MONTH, -1)
+        return CalendarWrapper(calendar)
+    }
+
+    /**
+     * 切换下一个月
+     */
+    fun monthPlus(): CalendarWrapper {
+        calendar.add(Calendar.MONTH, 1)
+        return CalendarWrapper(calendar)
+    }
+
+    /**
+     * 切换回今天
+     */
+    fun today(): CalendarWrapper {
+        return CalendarWrapper(Calendar.getInstance())
+    }
+}
 
 /**
  * 日历组件
@@ -84,17 +111,15 @@ fun CalendarItem(
  * 日历抬头
  */
 @Composable
-fun CalendarHead(mutableCalendar: MutableState<Calendar>) {
-    val calendar = mutableCalendar.value
+fun CalendarHead(mutableCalendar: MutableState<CalendarWrapper>) {
+    val calendar = mutableCalendar.value.calendar
     val weekHead = arrayOf("SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT")
     val yyyyMMdd =
         "${calendar.get(Calendar.YEAR)} / ${calendar.get(Calendar.MONTH) + 1}"
     Column {
         Row(verticalAlignment = Alignment.CenterVertically) {
             IconButton(onClick = {
-                val c = Calendar.getInstance()
-                c.add(Calendar.MONTH, -1)
-                mutableCalendar.value = c
+                mutableCalendar.value = mutableCalendar.value.monthMinus()
             }) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
@@ -103,14 +128,17 @@ fun CalendarHead(mutableCalendar: MutableState<Calendar>) {
             }
             Text(text = yyyyMMdd)
             IconButton(onClick = {
-                val c = Calendar.getInstance()
-                c.add(Calendar.MONTH, 1)
-                mutableCalendar.value = c
+                mutableCalendar.value = mutableCalendar.value.monthPlus()
             }) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowForward,
                     contentDescription = "ArrowForward"
                 )
+            }
+            TextButton(onClick = {
+                mutableCalendar.value = mutableCalendar.value.today()
+            }) {
+                Text(text = "Today")
             }
         }
         Spacer(Modifier.height(8.dp))
@@ -138,11 +166,11 @@ private fun Calendar.isSameDay(calendar: Calendar): Boolean {
  * 日历面板
  */
 @Composable
-fun LeoCalendar(calendar: Calendar = Calendar.getInstance()) {
+fun LeoCalendar(calendar: Calendar) {
     val c = remember(calendar) {
-        mutableStateOf(calendar)
+        mutableStateOf(CalendarWrapper(calendar))
     }
-    val weekList = getCalendarList(c.value)
+    val weekList = getCalendarList(c.value.calendar)
     Column {
         CalendarHead(c)
         Spacer(modifier = Modifier.height(8.dp))
@@ -161,6 +189,7 @@ fun LeoCalendar(calendar: Calendar = Calendar.getInstance()) {
 }
 
 private fun getCalendarList(c: Calendar): ArrayList<MutableList<CalendarData>> {
+    Log.d("getCalendarList", "${c.time}")
     val calendar = Calendar.getInstance().apply {
         time = c.time
     }
@@ -168,15 +197,12 @@ private fun getCalendarList(c: Calendar): ArrayList<MutableList<CalendarData>> {
     calendar.set(Calendar.DAY_OF_MONTH, 1)
     //当前第几月
     val month = calendar.get(Calendar.MONTH)
-    //当前月有多少天
-    val lastDay = calendar.getActualMaximum(Calendar.DAY_OF_MONTH)
     //当月第一天是周几
     val week = calendar.get(Calendar.DAY_OF_WEEK)
     //生成当月数据
     val weekList = arrayListOf<MutableList<CalendarData>>()
     //第一行第一天
     calendar.add(Calendar.DAY_OF_MONTH, -week + 1)
-    var line = 1
     var day = calendar.get(Calendar.DAY_OF_MONTH)
     repeat(6) {
         val weekDayList = mutableListOf<CalendarData>()
@@ -192,7 +218,6 @@ private fun getCalendarList(c: Calendar): ArrayList<MutableList<CalendarData>> {
             day = calendar.get(Calendar.DAY_OF_MONTH)
         }
         weekList.add(weekDayList)
-        line++
     }
     return weekList
 }
