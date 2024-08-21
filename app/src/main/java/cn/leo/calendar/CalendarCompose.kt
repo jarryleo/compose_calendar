@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -25,6 +26,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.PlatformTextStyle
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -96,14 +99,20 @@ fun CalendarItem(
                     CalendarItemState.OTHER -> Color.Transparent
                 }, shape = CircleShape
             )
-            .padding(5.dp),
+            .padding(5.dp)
+            .wrapContentSize(Alignment.Center),
         fontSize = 14.sp,
         textAlign = TextAlign.Center,
         color = when (data.state) {
             CalendarItemState.NORMAL -> Color.Black
             CalendarItemState.SELECTED -> Color.White
             CalendarItemState.OTHER -> Color.LightGray
-        }
+        },
+        style = TextStyle(
+            platformStyle = PlatformTextStyle(
+                includeFontPadding = false
+            )
+        )
     )
 }
 
