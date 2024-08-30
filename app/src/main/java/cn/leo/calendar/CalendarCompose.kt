@@ -86,12 +86,12 @@ class CalendarWrapper(val calendar: Calendar) {
 fun CalendarItem(
     data: CalendarData
 ) {
-    val textColor = when (data.state) {
+    val bgColor = when (data.state) {
         CalendarItemState.NORMAL -> Color.Transparent
         CalendarItemState.SELECTED -> Color.Blue
         CalendarItemState.OTHER -> Color.Transparent
     }
-    val bgColor = when (data.state) {
+    val textColor = when (data.state) {
         CalendarItemState.NORMAL -> Color.Black
         CalendarItemState.SELECTED -> Color.White
         CalendarItemState.OTHER -> Color.LightGray
@@ -102,14 +102,14 @@ fun CalendarItem(
             .width(30.dp)
             .height(30.dp)
             .background(
-                color = textColor,
+                color = bgColor,
                 shape = CircleShape
             )
             .padding(5.dp)
             .wrapContentSize(Alignment.Center),
         fontSize = 14.sp,
         textAlign = TextAlign.Center,
-        color = bgColor,
+        color = textColor,
         style = TextStyle(
             platformStyle = PlatformTextStyle(
                 includeFontPadding = false
